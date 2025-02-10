@@ -62,7 +62,7 @@ namespace LibraryAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBook(int id, Book book)
         {
-            if (id != book.Id)
+            if (id != book.Id) 
             {
                 return BadRequest();
             }
@@ -89,12 +89,24 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Book>> PostBook(Book book)
+        public async Task<ActionResult<Book>> PostBook(CreateBookDto b)
         {
+
+            var book = new Book
+            {
+                
+                Id = b.id,
+                title = b.title,
+                description = b.description,
+                authorId = b.authorId,
+                
+
+            };
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction("GetBook", new { id = book.Id }, book);
+
         }
 
         // DELETE: api/Books/5
