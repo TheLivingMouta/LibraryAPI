@@ -99,7 +99,6 @@ namespace LibraryAPI.Controllers
                 title = b.title,
                 description = b.description,
                 authorId = b.authorId,
-                
 
             };
 

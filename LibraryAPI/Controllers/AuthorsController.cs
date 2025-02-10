@@ -22,28 +22,62 @@ namespace LibraryAPI.Controllers
 
         // GET: api/Authors
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
+        public async Task<ActionResult<IEnumerable<GetAuthorDto>>> GetAuthors()
         {
-            return await _context.Authors.ToListAsync();
-        }
+			if (_context.Authors == null)
+			{
+				return NotFound();
+			}
+
+			var authors = await _context.Authors.Select(t => new GetAuthorDto()
+			{
+
+				Id = t.Id,
+				FirstName = t.FirstName,
+                LastName = t.LastName,
+                MainCategory = t.MainCategory,
+
+			}
+			).ToListAsync();
+
+			return Ok(authors);
+		}
 
         // GET: api/Authors/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Author>> GetAuthor(int id)
-        {
-            var author = await _context.Authors.FindAsync(id);
+		public async Task<ActionResult<IEnumerable<GetAuthorAndBooks>>> GetAuthorsAndBooks()
+		{
+			if (_context.Authors == null)
+			{
+				return NotFound();
+			}
 
-            if (author == null)
-            {
-                return NotFound();
-            }
+			var authors = await _context.Authors.Include(a => a.Books).Select(a => new GetAuthorAndBooks()
+			{
 
-            return author;
-        }
+				Id = a.Id,
+				FirstName = a.FirstName,
+				LastName = a.LastName,
+				Books = a.Books.Select(b => new BookDto
+				{
 
-        // PUT: api/Authors/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+					Id = b.Id,
+					Title = b.title,
+					Description = b.description,
+
+
+				}
+				).ToList()
+
+			}
+			).ToListAsync();
+
+			return Ok(authors);
+		}
+
+		// PUT: api/Authors/5
+		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+		[HttpPut("{id}")]
         public async Task<IActionResult> PutAuthor(int id, Author author)
         {
             if (id != author.Id)
